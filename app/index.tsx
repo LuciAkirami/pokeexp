@@ -58,6 +58,7 @@ export default function Screen() {
       description: 'Calculate XP between specific levels',
       icon: BarChart3,
       gradientColors: ['#ef4444', '#f43f5e'] as const,
+      href: '/detailed-xp-calculator',
     },
     {
       id: 'catch-xp',
@@ -66,6 +67,7 @@ export default function Screen() {
       description: 'Calculate XP from catching Pokémon',
       icon: Zap,
       gradientColors: ['#b91c1c', '#dc2626'] as const,
+      href: '/catch-xp-calculator',
     },
     {
       id: 'evolution-xp',
@@ -74,6 +76,7 @@ export default function Screen() {
       description: 'Calculate XP from evolving Pokémon',
       icon: Shuffle,
       gradientColors: ['#e11d48', '#ef4444'] as const,
+      href: '/evolution-xp-calculator',
     },
     {
       id: 'hatching-xp',
@@ -82,6 +85,7 @@ export default function Screen() {
       description: 'Calculate XP from hatching eggs',
       icon: Egg,
       gradientColors: ['#dc2626', '#e11d48'] as const,
+      href: '/hatching-xp-calculator',
     },
     {
       id: 'raid-xp',
@@ -90,6 +94,7 @@ export default function Screen() {
       description: 'Calculate XP from raid battles',
       icon: Sword,
       gradientColors: ['#be123c', '#dc2626'] as const,
+      href: '/raid-xp-calculator',
     },
     {
       id: 'max-battle-xp',
@@ -98,6 +103,7 @@ export default function Screen() {
       description: 'Calculate XP from Max Battles',
       icon: Shield,
       gradientColors: ['#ef4444', '#b91c1c'] as const,
+      href: '/max-battle-xp-calculator',
     },
     {
       id: 'max-moves-xp',
@@ -106,6 +112,7 @@ export default function Screen() {
       description: 'Calculate XP from Max Moves',
       icon: Zap,
       gradientColors: ['#f43f5e', '#ef4444'] as const,
+      href: '/max-moves-xp-calculator',
     },
     {
       id: 'friendship-xp',
@@ -114,6 +121,7 @@ export default function Screen() {
       description: 'Calculate XP from friendship levels',
       icon: Heart,
       gradientColors: ['#b91c1c', '#be123c'] as const,
+      href: '/friendship-xp-calculator',
     },
   ];
 

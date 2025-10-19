@@ -18,7 +18,17 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'light']}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <Stack />
+      {/* <Stack /> */}
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: true }} />
+        <Stack.Screen name="catch-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="evolution-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="hatching-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="raid-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="max-battle-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="max-moves-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="friendship-xp-calculator" options={{ headerShown: false }} />
+      </Stack>
       <PortalHost />
     </ThemeProvider>
   );
