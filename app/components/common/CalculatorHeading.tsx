@@ -16,7 +16,7 @@ export default function CalculatorHeading({ title, description, onBack }: { titl
       }}
       className="px-6 pb-4">
       <View className="flex-row items-center gap-4">
-        <BlurView intensity={20} tint="dark" className="h-10 w-10 overflow-hidden rounded-full">
+        <BlurView intensity={10} tint="dark" className="h-10 w-10 overflow-hidden rounded-full">
           <TouchableOpacity
             onPress={onBack}
             className="h-full w-full items-center justify-center active:opacity-70">
