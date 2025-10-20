@@ -14,7 +14,6 @@ import { Label } from '@/components/ui/label';
 // import { LuckyEggCard } from '@/components/common/lucky-egg-card';
 import { XP_MULTIPLIERS, GAME_CONSTANTS } from '@/types/xp-constants';
 import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -128,18 +127,6 @@ export function FriendshipXPCalculator({ onBack }: FriendshipXPCalculatorProps) 
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        {/* <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <TouchableOpacity onPress={onBack} style={styles.backButton}>
-              <ArrowLeft size={20} color="#ef4444" />
-            </TouchableOpacity>
-            <View>
-              <Text style={styles.title}>Friendship XP Calculator</Text>
-              <Text style={styles.subtitle}>Calculate XP from friendship levels</Text>
-            </View>
-          </View>
-        </View> */}
 
         {/* Calculator Content */}
         <View style={styles.main}>

@@ -1,5 +1,7 @@
 // import { FriendshipXPCalculator } from './components/friendship-xp-calculator copy';
-import { FriendshipXPCalculator } from './components/friendship-xp-calculator';
+import { FriendshipXPCalculator } from './components/calculators/friendship-xp-calculator';
+// import { FriendshipXPCalculator } from './components/calculators/friendship-xp-calculator copy 2';
+
 import { useRouter } from 'expo-router';
 
 export default function FriendshipXPCalculatorScreen() {
