@@ -6,6 +6,7 @@ import { PortalHost } from '@rn-primitives/portal';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
+import {BannerAd, BannerAdSize, TestIds} from 'react-native-google-mobile-ads';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -30,6 +31,17 @@ export default function RootLayout() {
         <Stack.Screen name="friendship-xp-calculator" options={{ headerShown: false }} />
       </Stack>
       <PortalHost />
+      {/* <BannerAd
+        unitId={TestIds.BANNER}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: true,
+          networkExtras: {
+            collapsible: "bottom",
+          }
+        }}
+        onAdFailedToLoad={(error) => console.log(error)}
+      /> */}
     </ThemeProvider>
   );
 }

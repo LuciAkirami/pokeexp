@@ -43,3 +43,4 @@ expo-env.d.ts
 android/gradle.properties
 
 app/components/calculators/test
+app/test
