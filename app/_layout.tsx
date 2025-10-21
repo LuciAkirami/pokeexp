@@ -29,6 +29,7 @@ export default function RootLayout() {
         <Stack.Screen name="max-battle-xp-calculator" options={{ headerShown: false }} />
         <Stack.Screen name="max-moves-xp-calculator" options={{ headerShown: false }} />
         <Stack.Screen name="friendship-xp-calculator" options={{ headerShown: false }} />
+        <Stack.Screen name="detailed-xp-calculator" options={{ headerShown: false }} />
       </Stack>
       <PortalHost />
       {/* <BannerAd

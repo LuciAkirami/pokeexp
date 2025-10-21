@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, useColorScheme, StyleSheet } from 'react-native';
-import { ArrowLeft, Calculator } from 'lucide-react-native';
+import { View, Text, ScrollView, TextInput, useColorScheme } from 'react-native';
+import { Calculator } from 'lucide-react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { LuckyEggCard } from '../common/LuckyEgg';
 import { XP_MULTIPLIERS } from '@/types/xp-constants';
-import MaskedView from '@react-native-masked-view/masked-view';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BlurView } from 'expo-blur';
 import ResultCard from '../common/ResultCard';
-import { cn } from '@/lib/utils';
 import CalculatorHeading from '../common/CalculatorHeading';
 
 interface MaxBattleInputs {
