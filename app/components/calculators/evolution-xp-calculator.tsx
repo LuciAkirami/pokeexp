@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TextInput,
   useColorScheme,
-  Pressable, // Import Pressable
-  BackHandler, // Import BackHandler
+  Pressable,
+  BackHandler,
 } from 'react-native';
 import { Calculator } from 'lucide-react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +15,7 @@ import { LuckyEggCard } from '../common/LuckyEgg';
 import { XP_MULTIPLIERS } from '@/types/xp-constants';
 import ResultCard from '../common/ResultCard';
 import CalculatorHeading from '../common/CalculatorHeading';
-import { Numpad } from '../common/Numpad'; // Assuming this is correct path
+import { Numpad } from '../common/Numpad';
 
 // --- Interfaces ---
 interface EvolutionInputs {
@@ -28,7 +28,6 @@ interface EvolutionXPCalculatorProps {
   onBack: () => void;
 }
 
-// Type for tracking the active input
 type ActiveInputField = 'normal_evolutions' | 'new_pokemon_evolutions' | null;
 
 export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
@@ -43,25 +42,19 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
   // --- Handle Back Button ---
   useEffect(() => {
     const onBackPress = () => {
-      // If the numpad is open
       if (activeInput !== null) {
-        // Close the numpad
         setActiveInput(null);
-        // Tell Android we've handled the back button
         return true;
       }
-      // Numpad is closed, let the default action (navigate back) happen
       return false;
     };
 
-    // Add the event listener and store the subscription
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-    // Remove the event listener on cleanup by calling .remove()
     return () => subscription.remove();
-  }, [activeInput]); // Re-run the effect if activeInput changes
+  }, [activeInput]);
 
-  // --- (Calculation and update logic remains the same) ---
+  // --- Calculation Logic ---
   const calculateTotalXP = (): number => {
     let totalXP = 0;
     const normalEvolutions = Number.parseInt(inputs.normal_evolutions) || 0;
@@ -150,88 +143,84 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
         onBack={onBack}
       />
 
-      {/* This Pressable handles "tapping off" the inputs to close the numpad */}
-      <Pressable className="flex-1" onPress={() => setActiveInput(null)}>
-        <ScrollView
-          contentContainerClassName="pb-8"
-          // This also helps close the numpad when you start scrolling
-          // onScrollBeginDrag={() => setActiveInput(null)}
-          >
-          {/* This View "eats" the tap so it doesn't close the numpad
-              when you tap on the content area */}
-          <View className="gap-6 px-6" onStartShouldSetResponder={() => true}>
-            <LuckyEggCard
-              isActive={inputs.lucky_egg}
-              onToggle={(checked) => updateInput('lucky_egg', checked)}
-            />
+      <ScrollView contentContainerClassName="pb-8" keyboardShouldPersistTaps="handled">
+        {/* Pressable wrapper that closes numpad on tap */}
+        <Pressable onPress={() => setActiveInput(null)} className="gap-6 px-6">
+          <LuckyEggCard
+            isActive={inputs.lucky_egg}
+            onToggle={(checked) => updateInput('lucky_egg', checked)}
+          />
 
-            <Card className={`${theme.cardBg} ${theme.cardBorderColor}`}>
-              <CardHeader className="pb-4">
-                <CardTitle>
-                  <View className="flex-row items-center gap-2">
-                    <Calculator color="#ef4444" className="h-5 w-5" />
-                    <Text className={`text-lg font-semibold ${theme.textPrimary}`}>
-                      Evolution Activities
-                    </Text>
-                  </View>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="gap-4">
-                <View className="gap-2">
-                  <Label nativeID="normal_evolutions">Normal Evolutions</Label>
-                  <Pressable onPress={() => setActiveInput('normal_evolutions')}>
-                    <TextInput
-                      value={inputs.normal_evolutions}
-                      className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
-                        activeInput === 'normal_evolutions' ? 'border-primary' : theme.borderColor
-                      }`}
-                      placeholder="0"
-                      placeholderTextColor="#9ca3af"
-                      showSoftInputOnFocus={false}
-                      // Use onFocus as a fallback
-                      onFocus={() => setActiveInput('normal_evolutions')}
-                    />
-                  </Pressable>
-                  <Text className={`text-xs ${theme.textSecondary}`}>
-                    +{XP_MULTIPLIERS.evolution.normal.toLocaleString()} XP each
+          <Card className={`${theme.cardBg} ${theme.cardBorderColor}`}>
+            <CardHeader className="pb-4">
+              <CardTitle>
+                <View className="flex-row items-center gap-2">
+                  <Calculator color="#ef4444" className="h-5 w-5" />
+                  <Text className={`text-lg font-semibold ${theme.textPrimary}`}>
+                    Evolution Activities
                   </Text>
                 </View>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="gap-4">
+              <View className="gap-2">
+                <Label nativeID="normal_evolutions">Normal Evolutions</Label>
+                <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setActiveInput('normal_evolutions');
+                  }}>
+                  <TextInput
+                    // editable={false}
+                    value={inputs.normal_evolutions}
+                    className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
+                      activeInput === 'normal_evolutions' ? 'border-primary' : theme.borderColor
+                    }`}
+                    placeholder="0"
+                    placeholderTextColor="#9ca3af"
+                    showSoftInputOnFocus={false}
+                    onFocus={() => setActiveInput('normal_evolutions')}
+                  />
+                </Pressable>
+                <Text className={`text-xs ${theme.textSecondary}`}>
+                  +{XP_MULTIPLIERS.evolution.normal.toLocaleString()} XP each
+                </Text>
+              </View>
 
-                <View className="gap-2">
-                  <Label nativeID="new_pokemon_evolutions">New Pokémon Evolutions</Label>
-                  <Pressable onPress={() => setActiveInput('new_pokemon_evolutions')}>
-                    <TextInput
-                      value={inputs.new_pokemon_evolutions}
-                      className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
-                        activeInput === 'new_pokemon_evolutions'
-                          ? 'border-primary'
-                          : theme.borderColor
-                      }`}
-                      placeholder="0"
-                      placeholderTextColor="#9ca3af"
-                      showSoftInputOnFocus={false}
-                      onFocus={() => setActiveInput('new_pokemon_evolutions')}
-                    />
-                  </Pressable>
-                  <Text className={`text-xs ${theme.textSecondary}`}>
-                    +{XP_MULTIPLIERS.evolution.new_pokemon.toLocaleString()} XP each
-                  </Text>
-                </View>
-              </CardContent>
-            </Card>
+              <View className="gap-2">
+                <Label nativeID="new_pokemon_evolutions">New Pokémon Evolutions</Label>
+                <Pressable
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setActiveInput('new_pokemon_evolutions');
+                  }}>
+                  <TextInput
+                    value={inputs.new_pokemon_evolutions}
+                    className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
+                      activeInput === 'new_pokemon_evolutions'
+                        ? 'border-primary'
+                        : theme.borderColor
+                    }`}
+                    placeholder="0"
+                    placeholderTextColor="#9ca3af"
+                    showSoftInputOnFocus={false}
+                    onFocus={() => setActiveInput('new_pokemon_evolutions')}
+                  />
+                </Pressable>
+                <Text className={`text-xs ${theme.textSecondary}`}>
+                  +{XP_MULTIPLIERS.evolution.new_pokemon.toLocaleString()} XP each
+                </Text>
+              </View>
+            </CardContent>
+          </Card>
 
-            <ResultCard totalXP={totalXP} />
-          </View>
-        </ScrollView>
-      </Pressable>
+          <ResultCard totalXP={totalXP} />
+        </Pressable>
+      </ScrollView>
 
       {/* --- Conditional Rendering --- */}
-      {/* Only render the Numpad if an input is active */}
       {activeInput !== null && (
-        <View
-          className="border-t border-white/10"
-          // This stops a tap on the numpad from closing itself
-          onStartShouldSetResponder={() => true}>
+        <View className="border-t border-white/10" onStartShouldSetResponder={() => true}>
           <Numpad onKeyPress={handleNumpadKeyPress} theme={theme} />
         </View>
       )}
