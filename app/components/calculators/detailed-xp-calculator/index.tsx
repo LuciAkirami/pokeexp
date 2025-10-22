@@ -16,7 +16,7 @@ import { useThemeStyles } from '@/hooks/useThemeStyles';
 
 export function DetailedXPCalculator({ onBack }: DetailedXPCalculatorProps) {
   // 4. Use the hooks
-  const { inputs, updateInput, handleNumberInput, progress } = useDetailedXPCalculator();
+  const { inputs, updateInput, handleNumberInput, progress, timeToTarget, dailyReq } = useDetailedXPCalculator();
 
   const theme = useThemeStyles();
 
@@ -43,7 +43,7 @@ export function DetailedXPCalculator({ onBack }: DetailedXPCalculatorProps) {
 
           <XPInputTabs inputs={inputs} handleNumberInput={handleNumberInput} theme={theme} />
 
-          <XPResults progress={progress} luckyEggActive={inputs.lucky_egg} theme={theme} />
+          <XPResults progress={progress} luckyEggActive={inputs.lucky_egg} theme={theme} timeToTarget={timeToTarget} dailyReq={dailyReq} inputs={inputs} />
         </View>
       </ScrollView>
     </View>

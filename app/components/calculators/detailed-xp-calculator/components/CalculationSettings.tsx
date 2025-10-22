@@ -46,6 +46,7 @@ export function CalculationSettings({
         {/* Target Timeline Toggle */}
         <View className="gap-4">
           <View
+            collapsable={false}
             className={`flex-row items-center justify-between rounded-lg p-4 ${theme.inputBg} border ${theme.borderColor}`}>
             <View className="flex-1 gap-1">
               <View className="flex-row items-center gap-2">
@@ -133,6 +134,7 @@ export function CalculationSettings({
 
         {/* Lucky Egg Toggle */}
         <View
+          collapsable={false}
           className={`flex-row items-center justify-between rounded-lg p-4 ${theme.inputBg} border ${theme.borderColor}`}>
           <View className="flex-1 gap-1">
             <Text className={`text-base font-semibold ${theme.textPrimary}`}>Lucky Egg Active</Text>

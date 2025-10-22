@@ -1,5 +1,12 @@
 import { useColorScheme } from 'react-native';
 
+const themeColors = {
+  primary: '#ef4444',
+  gray400: '#9ca3af',
+  gray600: '#4b5563',
+  // ... add other colors 
+};
+
 export function useThemeStyles() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -16,5 +23,11 @@ export function useThemeStyles() {
     placeholderTextColor: isDark ? '#555' : '#ccc',
     primaryColor: '#ef4444', // Red-500
     tabTextColor: isDark ? 'text-black' : 'text-white',
+    // Raw color values
+    colors: {
+      primary: themeColors.primary,
+      textSecondary: isDark ? themeColors.gray400 : themeColors.gray600,
+      // ...
+    },
   };
 }
