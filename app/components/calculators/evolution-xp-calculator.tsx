@@ -42,6 +42,11 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
   const normalInputRef = useRef<TextInput>(null);
   const newPokemonInputRef = useRef<TextInput>(null);
 
+  const inputRefs: Record<Exclude<ActiveInputField, null>, React.RefObject<TextInput | null>> = {
+    normal_evolutions: normalInputRef,
+    new_pokemon_evolutions: newPokemonInputRef,
+  };
+
   // --- Handle Back Button ---
   useEffect(() => {
     const onBackPress = () => {
@@ -109,13 +114,13 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
         if (int_value > normal_evolutions) {
           updateInput(field, normal_evolutions.toString());
         } else {
-          updateInput(field, value);
+          updateInput(field, int_value.toString());
         }
       } else if (field === 'normal_evolutions') {
         if (int_value < new_pokemon_evolutions) {
-          updateInput('new_pokemon_evolutions', value);
+          updateInput('new_pokemon_evolutions', int_value.toString());
         }
-        updateInput(field, value);
+        updateInput(field, int_value.toString());
         if (int_value === 0) {
           updateInput('new_pokemon_evolutions', '');
         }
@@ -151,10 +156,13 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
         <Pressable
           onPress={() => {
             // --- MODIFIED HERE ---
-            if (activeInput === 'normal_evolutions') {
-              normalInputRef.current?.blur();
-            } else if (activeInput === 'new_pokemon_evolutions') {
-              newPokemonInputRef.current?.blur();
+            // if (activeInput === 'normal_evolutions') {
+            //   normalInputRef.current?.blur();
+            // } else if (activeInput === 'new_pokemon_evolutions') {
+            //   newPokemonInputRef.current?.blur();
+            // }
+            if (activeInput && inputRefs[activeInput]) {
+              inputRefs[activeInput]?.current?.blur();
             }
             setActiveInput(null);
             // --- END MODIFICATION ---
