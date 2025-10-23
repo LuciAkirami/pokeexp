@@ -197,7 +197,7 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
               </View>
 
               <View className="gap-2">
-                <Label nativeID="new_pokemon_evolutions">New Pokémon Evolutions</Label>
+                <Label nativeID="new_pokemon_evolutions">New Pokemon Evolutions</Label>
                 <TextInput
                   ref={newPokemonInputRef} // <-- ADDED
                   value={inputs.new_pokemon_evolutions}
@@ -214,10 +214,18 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
                   +{XP_MULTIPLIERS.evolution.new_pokemon.toLocaleString()} XP each
                 </Text>
               </View>
+              <View>
+                <Text className={`text-xs font-semibold ${theme.textSecondary}`}>
+                  Note:
+                </Text>
+                <Text className={`text-xs ${theme.textSecondary}`}>
+                  New Pokemon Evolutions can't be more than Normal Evolutions
+                </Text>
+              </View>
             </CardContent>
           </Card>
 
-          <ResultCard totalXP={totalXP} />
+          <ResultCard totalXP={totalXP} luckEggStatus={inputs.lucky_egg}/>
         </Pressable>
       </ScrollView>
 
