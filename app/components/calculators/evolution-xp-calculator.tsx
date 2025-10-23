@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -38,6 +38,9 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
   });
 
   const [activeInput, setActiveInput] = useState<ActiveInputField>(null);
+  // --- ADD THESE ---
+  const normalInputRef = useRef<TextInput>(null);
+  const newPokemonInputRef = useRef<TextInput>(null);
 
   // --- Handle Back Button ---
   useEffect(() => {
@@ -145,7 +148,18 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
 
       <ScrollView contentContainerClassName="pb-8" keyboardShouldPersistTaps="handled">
         {/* Pressable wrapper that closes numpad on tap */}
-        <Pressable onPress={() => setActiveInput(null)} className="gap-6 px-6">
+        <Pressable
+          onPress={() => {
+            // --- MODIFIED HERE ---
+            if (activeInput === 'normal_evolutions') {
+              normalInputRef.current?.blur();
+            } else if (activeInput === 'new_pokemon_evolutions') {
+              newPokemonInputRef.current?.blur();
+            }
+            setActiveInput(null);
+            // --- END MODIFICATION ---
+          }}
+          className="gap-6 px-6">
           <LuckyEggCard
             isActive={inputs.lucky_egg}
             onToggle={(checked) => updateInput('lucky_egg', checked)}
@@ -165,23 +179,18 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
             <CardContent className="gap-4">
               <View className="gap-2">
                 <Label nativeID="normal_evolutions">Normal Evolutions</Label>
-                <Pressable
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    setActiveInput('normal_evolutions');
-                  }}>
-                  <TextInput
-                    // editable={false}
-                    value={inputs.normal_evolutions}
-                    className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
-                      activeInput === 'normal_evolutions' ? 'border-primary' : theme.borderColor
-                    }`}
-                    placeholder="0"
-                    placeholderTextColor="#9ca3af"
-                    showSoftInputOnFocus={false}
-                    onFocus={() => setActiveInput('normal_evolutions')}
-                  />
-                </Pressable>
+                <TextInput
+                  ref={normalInputRef} // <-- ADDED
+                  value={inputs.normal_evolutions}
+                  className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
+                    activeInput === 'normal_evolutions' ? 'border-primary' : theme.borderColor
+                  }`}
+                  placeholder="0"
+                  placeholderTextColor="#9ca3af"
+                  showSoftInputOnFocus={false}
+                  onFocus={() => setActiveInput('normal_evolutions')}
+                  onTouchStart={(e) => e.stopPropagation()} // <-- ADDED
+                />
                 <Text className={`text-xs ${theme.textSecondary}`}>
                   +{XP_MULTIPLIERS.evolution.normal.toLocaleString()} XP each
                 </Text>
@@ -189,24 +198,18 @@ export function EvolutionXPCalculator({ onBack }: EvolutionXPCalculatorProps) {
 
               <View className="gap-2">
                 <Label nativeID="new_pokemon_evolutions">New Pokémon Evolutions</Label>
-                <Pressable
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    setActiveInput('new_pokemon_evolutions');
-                  }}>
-                  <TextInput
-                    value={inputs.new_pokemon_evolutions}
-                    className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
-                      activeInput === 'new_pokemon_evolutions'
-                        ? 'border-primary'
-                        : theme.borderColor
-                    }`}
-                    placeholder="0"
-                    placeholderTextColor="#9ca3af"
-                    showSoftInputOnFocus={false}
-                    onFocus={() => setActiveInput('new_pokemon_evolutions')}
-                  />
-                </Pressable>
+                <TextInput
+                  ref={newPokemonInputRef} // <-- ADDED
+                  value={inputs.new_pokemon_evolutions}
+                  className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${
+                    activeInput === 'new_pokemon_evolutions' ? 'border-primary' : theme.borderColor
+                  }`}
+                  placeholder="0"
+                  placeholderTextColor="#9ca3af"
+                  showSoftInputOnFocus={false}
+                  onFocus={() => setActiveInput('new_pokemon_evolutions')}
+                  onTouchStart={(e) => e.stopPropagation()} // <-- ADDED
+                />
                 <Text className={`text-xs ${theme.textSecondary}`}>
                   +{XP_MULTIPLIERS.evolution.new_pokemon.toLocaleString()} XP each
                 </Text>
