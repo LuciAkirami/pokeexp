@@ -15,7 +15,7 @@ const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'backspace'
 
 export function Numpad({ onKeyPress, theme }: NumpadProps) {
   return (
-    <View className="w-full flex-row flex-wrap justify-center p-2">
+    <View className="w-full flex-row flex-wrap justify-center p-2 mb-2">
       {keys.map((key) => (
         <TouchableOpacity
           key={key}
