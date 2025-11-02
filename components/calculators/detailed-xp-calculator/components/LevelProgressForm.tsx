@@ -3,6 +3,7 @@ import { Target } from 'lucide-react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import type { DetailedXPInputs } from '@/types/xp-calculator';
+import { GAME_CONSTANTS } from '@/types/xp-constants';
 
 // Define theme props
 type ThemeProps = {
@@ -63,7 +64,7 @@ export default function LevelProgressForm({ inputs, handleNumberInput, theme }: 
               value={inputs.targetLevel}
               onChangeText={(val) => handleNumberInput('targetLevel', val)}
               className={`rounded-lg p-3 ${theme.inputBg} ${theme.textPrimary} border ${theme.borderColor}`}
-              placeholder="50"
+              placeholder={`${GAME_CONSTANTS.MAX_LEVEL}`}
               placeholderTextColor={theme.placeholderTextColor}
             />
           </View>
