@@ -1,47 +1,69 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react'; // Added useRef
 import {
   View,
   Text,
   ScrollView,
   TextInput,
   useColorScheme,
+  Pressable, // Added Pressable
 } from 'react-native';
+import Animated from 'react-native-reanimated'; // Added Animated
 import { Calculator } from 'lucide-react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import LuckyEggCard from '@/components/common/LuckyEgg';
 import { XP_MULTIPLIERS } from '@/types/xp-constants';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ResultCard from '@/components/common/ResultCard';
 import CalculatorHeading from '@/components/common/CalculatorHeading';
+import { MaxMovesInputs } from '@/types/xp-calculator';
 
-interface MaxMovesInputs {
-  level_1_moves: string;
-  level_2_moves: string;
-  level_max_moves: string;
-  lucky_egg: boolean;
-}
+// --- Import your new hook and Numpad ---
+import { useAnimatedNumpad } from '@/hooks/useAnimatedNumpad'; // Adjust path as needed
+import Numpad from '@/components/common/Numpad'; // Adjust path as needed
+
+// Create an animated version of the ScrollView
+const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
 interface MaxMovesXPCalculatorProps {
   onBack: () => void;
 }
 
+// --- Define ActiveInputField type ---
+type ActiveInputField = 'level_1_moves' | 'level_2_moves' | 'level_max_moves' | null;
+
 export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorProps) {
+  // --- Component State (Stays) ---
   const [inputs, setInputs] = useState<MaxMovesInputs>({
     level_1_moves: '',
     level_2_moves: '',
     level_max_moves: '',
-    lucky_egg: false,
   });
 
+  const [luckyEgg, setLuckyEgg] = useState<boolean>(false);
+
+  // --- Refs (Added) ---
+  const level1MovesRef = useRef<TextInput>(null);
+  const level2MovesRef = useRef<TextInput>(null);
+  const levelMaxMovesRef = useRef<TextInput>(null);
+
+  // --- Ref Map (Added) ---
+  const inputRefs: Record<Exclude<ActiveInputField, null>, React.RefObject<TextInput | null>> = {
+    level_1_moves: level1MovesRef,
+    level_2_moves: level2MovesRef,
+    level_max_moves: levelMaxMovesRef,
+  };
+
+  // --- Hook Integration (Added) ---
+  const { activeInput, setActiveInput, animatedNumpadStyle, animatedPaddingStyle, onNumpadLayout } =
+    useAnimatedNumpad(inputRefs);
+
+  // --- Business Logic (Stays) ---
   const handleNumberInput = (
-    field: keyof Pick<MaxMovesInputs, 'level_1_moves' | 'level_2_moves' | 'level_max_moves'>,
+    field: Exclude<ActiveInputField, null>, // Use the new type
     value: string
   ) => {
-    // Allow empty string or valid numbers only
     if (value === '' || /^\d+$/.test(value)) {
       const int_value = parseInt(value) || 0;
-      // Limit to 10000
       if (int_value > 10000) {
         value = '10000';
       }
@@ -59,25 +81,45 @@ export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorPro
     totalXP += level2Moves * XP_MULTIPLIERS.maxMoves.level_2;
     totalXP += levelMaxMoves * XP_MULTIPLIERS.maxMoves.level_max;
 
-    // Double XP if lucky egg is active
-    if (inputs.lucky_egg) {
+    if (luckyEgg) {
       totalXP *= 2;
     }
-
     return totalXP;
   };
 
-  const updateInput = (field: keyof MaxMovesInputs, value: string | boolean) => {
+  // Logic for lucky_egg is preserved
+  const updateInput = (field: keyof MaxMovesInputs | 'lucky_egg', value: string | boolean) => {
+    if (field === 'lucky_egg') {
+      setLuckyEgg((prev) => !prev);
+      return;
+    }
+
     setInputs((prev) => ({
       ...prev,
-      [field]: value,
+      [field as keyof MaxMovesInputs]: value, // Safe assertion
     }));
   };
 
+  // --- Numpad "Glue" Function (Added) ---
+  const handleNumpadKeyPress = (key: string) => {
+    if (!activeInput) return;
+
+    const activeField = activeInput as Exclude<ActiveInputField, null>;
+    const currentValue = inputs[activeField];
+
+    if (key === 'backspace') {
+      const newValue = currentValue.slice(0, -1);
+      handleNumberInput(activeField, newValue);
+    } else {
+      const newValue = currentValue + key;
+      handleNumberInput(activeField, newValue);
+    }
+  };
+
+  // --- Theme & Styles (Stays) ---
   const totalXP = calculateTotalXP();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
-  const insets = useSafeAreaInsets();
 
   const cardBg = isDark ? 'bg-[#1a1a1a]' : 'bg-white';
   const cardBorderColor = isDark ? 'border-[#2a2a2a]' : 'border-gray-200';
@@ -86,28 +128,50 @@ export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorPro
   const textSecondary = isDark ? 'text-gray-400' : 'text-gray-600';
   const borderColor = isDark ? 'border-[#2a2a2a]' : 'border-gray-200';
   const bg = isDark ? 'bg-black' : 'bg-background';
+  const placeholderTextColor = '#9ca3af';
+
+  // --- Theme Object (Added) ---
+  const theme = {
+    cardBg,
+    cardBorderColor,
+    inputBg,
+    textPrimary,
+    textSecondary,
+    borderColor,
+    bg,
+    primaryColor: '#ef4444',
+  };
 
   return (
     <View className={`flex-1 ${bg}`}>
-      {/* Header */}
+      {/* Header (No change) */}
       <CalculatorHeading
         title="Max Moves XP Calculator"
         description="Calculate XP from Max Moves"
         onBack={onBack}
       />
 
-      <ScrollView contentContainerClassName="pb-8">
-        {/* Calculator Content */}
-        <View className="gap-6 px-6">
-          {/* Lucky Egg Toggle */}
+      {/* --- Swapped ScrollView for AnimatedScrollView --- */}
+      <AnimatedScrollView className="flex-1" keyboardShouldPersistTaps="handled">
+        {/* --- Added Pressable Wrapper --- */}
+        <Pressable
+          onPress={() => {
+            if (activeInput && inputRefs[activeInput as keyof typeof inputRefs]) {
+              inputRefs[activeInput as keyof typeof inputRefs]?.current?.blur();
+            }
+            setActiveInput(null);
+          }}
+          className="gap-6 px-6">
+          {/* Lucky Egg Toggle (No change) */}
           <LuckyEggCard
-            isActive={inputs.lucky_egg}
+            isActive={luckyEgg}
             onToggle={(checked) => updateInput('lucky_egg', checked)}
           />
 
           {/* Input Fields Card */}
           <Card className={`${cardBg} ${cardBorderColor}`}>
             <CardHeader className="pb-4">
+              {/* ... (Card Header content, no change) ... */}
               <CardTitle className="">
                 <View className="flex-row items-center gap-2">
                   <Calculator color="#ef4444" className="h-5 w-5 text-primary" />
@@ -118,16 +182,22 @@ export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorPro
               </CardTitle>
             </CardHeader>
             <CardContent className="gap-4">
+              {/* --- Updated all TextInputs --- */}
+
               {/* Level 1 Moves */}
               <View className="gap-2">
                 <Label nativeID="level_1_moves">Level 1 Moves</Label>
                 <TextInput
-                  keyboardType="numeric"
+                  ref={level1MovesRef}
                   value={inputs.level_1_moves}
-                  onChangeText={(value) => handleNumberInput('level_1_moves', value)}
-                  className={`rounded-lg p-3 ${inputBg} ${textPrimary} border ${borderColor}`}
+                  className={`rounded-lg p-3 ${inputBg} ${textPrimary} border ${
+                    activeInput === 'level_1_moves' ? 'border-primary' : borderColor
+                  }`}
                   placeholder="0"
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={placeholderTextColor}
+                  showSoftInputOnFocus={false}
+                  onFocus={() => setActiveInput('level_1_moves')}
+                  onTouchStart={(e) => e.stopPropagation()}
                 />
                 <Text className="text-xs text-muted-foreground">
                   +{XP_MULTIPLIERS.maxMoves.level_1.toLocaleString()} XP each
@@ -138,12 +208,16 @@ export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorPro
               <View className="gap-2">
                 <Label nativeID="level_2_moves">Level 2 Moves</Label>
                 <TextInput
-                  keyboardType="numeric"
+                  ref={level2MovesRef}
                   value={inputs.level_2_moves}
-                  onChangeText={(value) => handleNumberInput('level_2_moves', value)}
-                  className={`rounded-lg p-3 ${inputBg} ${textPrimary} border ${borderColor}`}
+                  className={`rounded-lg p-3 ${inputBg} ${textPrimary} border ${
+                    activeInput === 'level_2_moves' ? 'border-primary' : borderColor
+                  }`}
                   placeholder="0"
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={placeholderTextColor}
+                  showSoftInputOnFocus={false}
+                  onFocus={() => setActiveInput('level_2_moves')}
+                  onTouchStart={(e) => e.stopPropagation()}
                 />
                 <Text className="text-xs text-muted-foreground">
                   +{XP_MULTIPLIERS.maxMoves.level_2.toLocaleString()} XP each
@@ -154,12 +228,16 @@ export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorPro
               <View className="gap-2">
                 <Label nativeID="level_max_moves">Level Max Moves</Label>
                 <TextInput
-                  keyboardType="numeric"
+                  ref={levelMaxMovesRef}
                   value={inputs.level_max_moves}
-                  onChangeText={(value) => handleNumberInput('level_max_moves', value)}
-                  className={`rounded-lg p-3 ${inputBg} ${textPrimary} border ${borderColor}`}
+                  className={`rounded-lg p-3 ${inputBg} ${textPrimary} border ${
+                    activeInput === 'level_max_moves' ? 'border-primary' : borderColor
+                  }`}
                   placeholder="0"
-                  placeholderTextColor="#9ca3af"
+                  placeholderTextColor={placeholderTextColor}
+                  showSoftInputOnFocus={false}
+                  onFocus={() => setActiveInput('level_max_moves')}
+                  onTouchStart={(e) => e.stopPropagation()}
                 />
                 <Text className="text-xs text-muted-foreground">
                   +{XP_MULTIPLIERS.maxMoves.level_max.toLocaleString()} XP each
@@ -168,10 +246,23 @@ export default function MaxMovesXPCalculator({ onBack }: MaxMovesXPCalculatorPro
             </CardContent>
           </Card>
 
-          {/* Results Card */}
-          <ResultCard totalXP={totalXP} luckEggStatus={inputs.lucky_egg} />
-        </View>
-      </ScrollView>
+          {/* Results Card (No change) */}
+          <ResultCard totalXP={totalXP} luckEggStatus={luckyEgg} />
+
+          {/* --- Added Animated Spacer --- */}
+          <Animated.View style={animatedPaddingStyle} />
+        </Pressable>
+      </AnimatedScrollView>
+
+      {/* --- Added Numpad Component --- */}
+      <Animated.View
+        style={animatedNumpadStyle}
+        className={`absolute bottom-0 left-0 right-0 border-t ${borderColor} ${bg}`}
+        onStartShouldSetResponder={() => true}
+        onLayout={onNumpadLayout} // Use layout handler from hook
+      >
+        <Numpad onKeyPress={handleNumpadKeyPress} theme={theme} />
+      </Animated.View>
     </View>
   );
 }
