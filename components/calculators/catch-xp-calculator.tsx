@@ -1,12 +1,5 @@
 import { useState, useRef } from 'react'; // Removed useEffect
-import {
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-  useColorScheme,
-  Pressable,
-} from 'react-native';
+import { View, Text, ScrollView, TextInput, useColorScheme, Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { Calculator } from 'lucide-react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,7 +42,7 @@ export default function CatchXPCalculator({ onBack }: CatchXPCalculatorProps) {
     great_throws: '',
     nice_throws: ''
   });
-  
+
   const [luckyEgg, setLuckyEgg] = useState(false);
 
   // --- State and animation logic for numpad is now GONE ---
@@ -124,13 +117,13 @@ export default function CatchXPCalculator({ onBack }: CatchXPCalculatorProps) {
       }
 
       if (field === 'normal_catches') {
-        if (int_value < curve_balls) updateInput('curve_balls', value);
-        if (int_value < first_throws) updateInput('first_throws', value);
-        if (int_value < new_pokemon_catches) updateInput('new_pokemon_catches', value);
-        if (int_value < excellent_throws) updateInput('excellent_throws', value);
-        if (int_value < great_throws) updateInput('great_throws', value);
-        if (int_value < nice_throws) updateInput('nice_throws', value);
-        updateInput(field, value);
+        if (int_value < curve_balls) updateInput('curve_balls', int_value.toString());
+        if (int_value < first_throws) updateInput('first_throws', int_value.toString());
+        if (int_value < new_pokemon_catches) updateInput('new_pokemon_catches', int_value.toString());
+        if (int_value < excellent_throws) updateInput('excellent_throws', int_value.toString());
+        if (int_value < great_throws) updateInput('great_throws', int_value.toString());
+        if (int_value < nice_throws) updateInput('nice_throws', int_value.toString());
+        updateInput(field, int_value.toString());
         if (int_value === 0) {
           updateInput('curve_balls', '');
           updateInput('first_throws', '');
@@ -159,8 +152,15 @@ export default function CatchXPCalculator({ onBack }: CatchXPCalculatorProps) {
         else updateInput(field, int_value.toString());
       }
 
+      /**
+       * If the value is 0, we will update the input field to an empty string
+       */
+      if (int_value === 0) {
+        updateInput(field, '');
+      }
+
       /** -------------- Why are we using int_value.toString() instead of value? --------------
-       * So, we know that user cannot input anything in any fields if normal_catches is empty. 
+       * So, we know that user cannot input anything in any fields if normal_catches is empty.
        * But if still, user tries to add any input to anything other than normal_catches, we will see the value 0 on screen
        * Now, if we change the normal_catches to any value, and then we try to update the other field, it it already contains 0
        * it will be like 054, 032, etc. That is it will have that 0 in the front, this is because value is a string and it treats 032 and 32 as different
@@ -431,6 +431,13 @@ export default function CatchXPCalculator({ onBack }: CatchXPCalculatorProps) {
                 />
                 <Text className={`text-xs ${textSecondary}`}>
                   +{XP_MULTIPLIERS.catching.first_throw.toLocaleString()} XP each
+                </Text>
+              </View>
+              {/* Note about business logic */}
+              <View>
+                <Text className={`text-xs font-semibold ${theme.textSecondary}`}>Note:</Text>
+                <Text className={`text-xs ${theme.textSecondary}`}>
+                  All fields must be less than or equal to "Normal Catches"
                 </Text>
               </View>
             </CardContent>
